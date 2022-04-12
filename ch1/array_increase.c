@@ -11,7 +11,7 @@ int main(void){
     int *tmp = (int *)malloc(8*sizeof(int));
 
     for (int i = 0; i < 4; i++){
-        tmp[i] = array[i];
+        tmp[i] = array[i]; //array บนป็
     }
 
     array = tmp;
