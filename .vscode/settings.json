@@ -1,3 +1,11 @@
 {
-    "files.autoGuessEncoding": false
+    //"files.autoGuessEncoding": false
+    // 코드 실행시 terminal clear
+    "code-runner.clearPreviousOutput": true,
+    // 기본 터미널 실행 (표준 입력시 필요)
+    "code-runner.runInTerminal": true,
+    // 실행 코드 (chcp 65001 : 한글 깨짐 방지 설정)
+    "code-runner.executorMap": {
+        "cpp": "chcp 65001 && cd $dir && g++ $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt"
+    }
 }
