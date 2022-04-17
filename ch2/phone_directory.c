@@ -68,6 +68,7 @@ void status() {
         printf("%s ", names[i]);
         printf("%s\n", numbers[i]);
     }
+    printf("Total %d persons.\n", &n);
 }
 
 void remove() {

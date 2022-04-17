@@ -1,0 +1,1 @@
+this is blockdmask file read write example
