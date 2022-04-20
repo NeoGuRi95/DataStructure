@@ -128,7 +128,7 @@ void load(char *filename){
             break;
         name = strtok(buffer, "#");
         token = strtok(NULL, "#");
-        if (token == NULL) 
+        if (token == NULL)
             number = NULL;
         else
             number = strdup(token);
