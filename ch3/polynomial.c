@@ -41,7 +41,7 @@ Term *create_term_instance() {
     return t;
 }
 
-Polynomial *create_polynomail_instance(char name) {
+Polynomial *create_polynomial_instance(char name) {
     Polynomial *ptr_poly = (Polynomial *)malloc(sizeof(Polynomial));
     ptr_poly->name = name;
     ptr_poly->first = NULL;
@@ -171,18 +171,6 @@ void erase_blanks(char *expression) {
     expression[k] = '\0';
 }
 
-Polynomial *create_by_add_two_polynomias(char name, char f, char g) {
-    Polynomial *poly = (Polynomial *)malloc(sizeof(Polynomial)), *f_poly, *g_poly;
-    poly->name = name;
-
-    for (int i = 0; i < n; i++) {
-        if (polys[i]->name == f) f_poly = polys[i];
-        else if (polys[i]->name == g) g_poly = polys[i];
-    }
-
-    
-}
-
 void destroy_polynomial(Polynomial *ptr_poly) {
     if (ptr_poly == NULL) return;
 
@@ -207,16 +195,104 @@ void insert_polynomial(Polynomial *ptr_poly) {
     n++;
 }
 
+Polynomial *create_by_add_two_polynomias(char name, char f, char g) {
+    Polynomial *poly = (Polynomial *)malloc(sizeof(Polynomial)), *f_poly, *g_poly;
+    poly->name = name;
+
+    for (int i = 0; i < n; i++) {
+        if (polys[i]->name == f) f_poly = polys[i];
+        else if (polys[i]->name == g) g_poly = polys[i];
+    }
+
+    Term *term = f_poly->first;
+    while (term != NULL) {
+        add_term(term->coef, term->expo, poly);
+        term = term->next;
+    }
+
+    term = g_poly->first;
+    while (term != NULL) {
+        add_term(term->coef, term->expo, poly);
+        term = term->next;
+    }
+}
+
+int parse_and_add_term(char *expr, int begin, int end, Polynomial *p_poly) {
+    int i=begin;
+    int sign_coef = 1, coef = 0, expo = 1;
+
+    if (expr[i] == '+')
+        i++;
+    else if (expr[i] == '-') {
+        sign_coef = -1;
+        i++;
+    }
+    while (i < end && expr[i] >= '0' && expr[i] <= '9') {
+        coef = coef*10 + (int)(expr[i]-'0');
+        i++;
+    }
+
+    if (coef == 0) coef = sign_coef;            // coef가 0인 경우 계수는 0이 아니라 1 혹은 -1 이다
+    else coef += sign_coef;
+
+    if (i >= end) {             // 더 이상 항을 구성하는 문자가 없다면 상수항이라는 의미이다.
+        add_term(coef, 0, p_poly);
+        return 1;
+    }
+
+    if (expr[i] != 'x') return 0;           // 계수 다음에 x가 아닌 다른 문자가 등장해서는 안된다.
+    i++;
+
+    if (i >= end) {         // 계수 다음에 x가 나오고 문자열이 끝난다면 1차항이라는 의미이다.
+        add_term(coef, 1, p_poly);
+        return 1;
+    }
+
+    if (expr[i] != '^') return 0;           // x 다음에 ^가 아닌 다른 문자가 등장해서는 안된다.
+    i++;
+
+    expo = 0;
+    while (i < end && expr[i] >= '0' && expr[i] <= '9') {           // 차수 부분을 읽는다.
+        expo = expo*10 + (int)(expr[i]-'0');
+        i++;
+    }
+
+    add_term(coef, expo, p_poly);
+    return 1;
+}
+
+Polynomial *create_by_parse_polynomial(char name, char *body) {
+    Polynomial *ptr_poly = create_polynomial_instance(name);
+
+    int i=0, begin_term=0;
+    while (i<strlen(body)) {
+        if (body[i]=='+' || body[i]=='-')
+            i++;
+        while (i<strlen(body) && body[i] != '+' && body[i] != '-')
+            i++;
+
+        int result = parse_and_add_term(body, begin_term, i, ptr_poly);
+
+        if (result == 0) {
+            destroy_polynomial(ptr_poly);
+            return NULL;
+        }
+
+        begin_term = i;
+    }
+    return ptr_poly;
+}
+
 void handle_definition(char *expression) {
     erase_blanks(expression);
     
-    char *f_name = strtok(expression, '=');
+    char *f_name = strtok(expression, "=");
     if (f_name == NULL || strlen(f_name) != 1) {
         printf("Unsupported command.");
         return;
     }
 
-    char *exp_body = strtok(NULL, '=');
+    char *exp_body = strtok(NULL, "=");
     if (exp_body == NULL || strlen(exp_body) <= 0) {
         printf("Invalid expression format.--");
         return;
