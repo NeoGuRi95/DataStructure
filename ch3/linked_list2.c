@@ -65,14 +65,29 @@ void remove(Node *p) {
     size--;
 }
 
-add_ordered_list(char *item) {          // start searching at tail
+void print(Node *start) {
+    Node *p = start;
+    while (p != NULL) {
+        printf(" --> %s", p->data);
+        p = p->next;
+    }
+    printf("\n");
+}
+
+void add_ordered_list(char *item) {          // start searching at tail
     Node *p = tail;
     while (p != NULL && strcmp(item, p->data) < 0) {
         p = p->prev;
     }
     add_after(p, item);
+    print(head);
 }
 
 int main() {
+    add_ordered_list("c");
+    add_ordered_list("a");
+    add_ordered_list("d");
+    add_ordered_list("b");
+    
     return 0;
 }
