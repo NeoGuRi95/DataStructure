@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 struct node
 {
@@ -108,7 +109,7 @@ Node *remove(int index) {
     Node *prev = get_node(index-1);
 
     if (prev == NULL)
-        reuturn NULL;
+        return NULL;
 
     return remove_after(prev);
 }
